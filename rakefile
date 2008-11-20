@@ -42,5 +42,6 @@ desc 'Tidy, clean, add, commit, and push'
 task 'git'=>[:tidy, :clean] do
   system('git add *')
   system('git commit')
-  system('git push origin master')
+  system('git remote add led git@github.com:rimmkaufman/led.git')
+  system('git push led master')
 end
