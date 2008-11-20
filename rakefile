@@ -1,0 +1,46 @@
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require 'fileutils'
+require 'rake/clean'
+include FileUtils
+
+task :default => [:push]
+
+desc "Run basic tests"
+Rake::TestTask.new("test_units") { |t|
+  t.pattern = 'test/t_*.rb'
+  t.verbose = true
+  t.warning = true
+}
+
+desc "Open e-editor on all ruby files"
+task "edit" do
+  system("e " + FileList['*.rb'].join(" ") )
+end
+
+html_dir = 'doc/html'
+library = '.b'
+Rake::RDocTask.new('rdoc') do |t|
+  t.rdoc_files.include('README', '*.rb')
+  t.main = 'README'
+  t.title = "API documentation"
+  t.rdoc_dir = html_dir
+end
+
+desc 'Remove scratch files'
+task 'clean' do
+  rm_f FileList['*~']
+end
+
+desc 'Tidy ruby source'
+task 'tidy' do
+  FileList['*.rb','rakefile'].each { |f| system("ruby rubytidy.rb #{f}") }
+end
+
+desc 'Tidy, clean, add, commit, and push'
+task 'git'=>[:tidy, :clean] do
+  system('git add *')
+  system('git commit')
+  system('git push origin master')
+end
